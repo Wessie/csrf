@@ -80,9 +80,10 @@ type csrf struct {
 
 // options contains the optional settings for the CSRF middleware.
 type options struct {
-	MaxAge int
-	Domain string
-	Path   string
+	Encoding EncodingInterface
+	MaxAge   int
+	Domain   string
+	Path     string
 	// Note that the function and field names match the case of the associated
 	// http.Cookie field instead of the "correct" HTTPOnly name that golint suggests.
 	HttpOnly       bool
@@ -170,6 +171,10 @@ func Protect(authKey []byte, opts ...Option) func(http.Handler) http.Handler {
 			cs.opts.RequestHeader = headerName
 		}
 
+		if cs.opts.Encoding == nil {
+			cs.opts.Encoding = defaultEncoding
+		}
+
 		// Create an authenticated securecookie instance.
 		if cs.sc == nil {
 			cs.sc = securecookie.New(authKey, nil)
@@ -235,7 +240,7 @@ func (cs *csrf) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Save the masked token to the request context
-	r = contextSave(r, tokenKey, mask(realToken, r))
+	r = contextSave(r, tokenKey, mask(cs.opts.Encoding, realToken, r))
 	// Save the field name to the request context
 	r = contextSave(r, formKey, cs.opts.FieldName)
 

@@ -7,6 +7,12 @@ import (
 // Option describes a functional option for configuring the CSRF handler.
 type Option func(*csrf)
 
+func Encoding(encoding EncodingInterface) Option {
+	return func(cs *csrf) {
+		cs.opts.Encoding = encoding
+	}
+}
+
 // MaxAge sets the maximum age (in seconds) of a CSRF token's underlying cookie.
 // Defaults to 12 hours. Call csrf.MaxAge(0) to explicitly set session-only
 // cookies.

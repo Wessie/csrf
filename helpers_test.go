@@ -139,7 +139,7 @@ func TestMaskUnmaskTokens(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	issued := mask(realToken, nil)
+	issued := mask(defaultEncoding, realToken, nil)
 	decoded, err := base64.StdEncoding.DecodeString(issued)
 	if err != nil {
 		t.Fatal(err)
